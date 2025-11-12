@@ -1,11 +1,16 @@
 <?php
-
+session_start();
 include 'dbconnect.php';
 
-
-$userId = $_POST['user_id'];
+if (!isset($_SESSION['id'])) {
+    die("Error: You must be logged in to buy stocks.");
+}
+$userId = $_SESSION['id'];
 $stockId = $_POST['stock_id'];
 $quantity = $_POST['quantity'];
+
+
+
 
 $sql = "SELECT price_per_share, available_shares FROM stocks WHERE id = $stockId";
 $result = mysqli_query($conn, $sql);
@@ -46,7 +51,7 @@ try {
     $owned = mysqli_fetch_assoc($result);
 
     if ($owned) {
-        $sql = "UPDATE user_stocks SET quantity = quanitiy + $quantity WHERE user_id = $userId AND stock_id = $stockId";
+        $sql = "UPDATE user_stocks SET quantity = quantity + $quantity WHERE user_id = $userId AND stock_id = $stockId";
         mysqli_query($conn, $sql);
     } else {
         $sql = "INSERT INTO user_stocks (user_id, stock_id, quantity) VALUES ($userId, $stockId, $quantity)";
@@ -54,8 +59,8 @@ try {
     }
 
     mysqli_commit($conn);
-    echo "Bought shares, $quantity";
-    echo "<a href='buy_form.php'>Go back</a>";
+    echo "Bought shares, $quantity ";
+    echo "<a href='Create.php'>Go back</a>";
 } catch (Exception $e) {
     mysqli_rollback($conn);
     echo "Transaction failed: " . $e->getMessage();

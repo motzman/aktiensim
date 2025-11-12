@@ -2,29 +2,38 @@
 session_start();
 include 'dbconnect.php';
 
+$error_message = '';
 
-if (count($_POST) > 0) {
-    $name =  $_POST['name'];
-    $password = $_POST['password'];
-    $sql = "SELECT * FROM users WHERE name = '$name'";
-    $result = mysqli_query($conn, $sql);
-    $num  = mysqli_num_rows($result);
 
-    if ($num == 1) {
-        while ($row = mysqli_fetch_assoc($result)) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    if (isset($_POST['username'], $_POST['password'])) {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
+
             if (password_verify($password, $row["password"])) {
-
-                $_SESSION['username'] = $name;
+                $_SESSION['username'] = $row['username'];
                 $_SESSION['id'] = $row['id'];
 
                 header("Location: index.php");
                 exit;
             } else {
-                echo "Error";
+                $error_message = "Invalid username or password.";
             }
+        } else {
+            $error_message = "Invalid username or password.";
         }
+        $stmt->close();
     } else {
-        echo "Error";
+        $error_message = "Please fill out all fields.";
     }
 }
 ?>
@@ -48,7 +57,7 @@ if (count($_POST) > 0) {
             <h1>Sign in</h1>
 
             <form method="POST">
-                <input type="name" name="name" placeholder="Your Name" required>
+                <input type="text" name="username" placeholder="Your Name" required>
                 <input type="password" name="password" placeholder="Your Password" required>
                 <div class="flex gap-4">
                     <button type="submit">Sign in</button>
