@@ -55,7 +55,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
         <div>
             <h1>Sign in</h1>
-
+        <?php if (!empty($error_message)): ?>
+                <p class="error"><?php echo $error_message; ?></p>
+            <?php endif; ?>
             <form method="POST">
                 <input type="text" name="username" placeholder="Your Name" required>
                 <input type="password" name="password" placeholder="Your Password" required>
