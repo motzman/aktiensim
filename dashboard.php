@@ -1,0 +1,163 @@
+<?php
+session_start();
+
+include 'dbconnect.php';
+
+if (!isset($_SESSION["id"])) {
+    die("Error: you must be logged in");
+}
+$userId = $_SESSION['id'];
+$username = $_SESSION['username'];
+
+try {
+    $sql = "SELECT us.quantity,
+     s.name AS stock_name,
+      s.price_per_share FROM user_stocks us   
+      INNER JOIN stocks s ON us.stock_id = s.id
+      WHERE us.user_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
+
+    $stmt = mysqli_prepare($conn, "SELECT balance FROM users WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+
+    $userResult = mysqli_stmt_get_result($stmt);
+    $userRow = $userResult->fetch_assoc();
+    $balance = $userRow["balance"];
+
+
+    $totalPortfolio = 0;
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Your Portfolio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: #2f3640;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #eef1ff;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 2px solid #dcdffe;
+        }
+
+        tr:nth-child(even) {
+            background: #fafbff;
+        }
+
+        .total {
+            margin-top: 25px;
+            background: #f0f3ff;
+            border-left: 4px solid #4c6ef5;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 18px;
+            color: #2c2f3b;
+            flex: auto;
+        }
+
+        .btnBack {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Welcome to your Portfolio, <?php echo $username; ?></h2>
+        <table>
+            <tr>
+                <th>Stock</th>
+                <th>Shares</th>
+                <th>Price per Share</th>
+                <th>Total Value</th>
+            </tr>
+            <?php
+            while ($row = $result->fetch_assoc()) {
+                $stockName = $row['stock_name'];
+                $quantity = $row['quantity'];
+                $pricePerShare = $row['price_per_share'];
+                $stockValue = $quantity * $pricePerShare;
+                $totalPortfolio += $stockValue;
+            ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($stockName); ?></td>
+                    <td><?php echo $quantity; ?></td>
+                    <td><?php echo number_format($pricePerShare, 2); ?> €</td>
+                    <td><?php echo number_format($stockValue, 2); ?> €</td>
+                </tr>
+            <?php } ?>
+        </table>
+
+        <div class="total">
+            <strong>Total Portfolio Value:</strong>
+            <?php echo number_format($totalPortfolio, 2); ?> €
+        </div>
+        <div class="total">
+             <strong>Your Balance:</strong>
+            <?php echo number_format($balance, 2); ?> €
+        </div>
+        <div>
+            <button onclick="window.location.href='index.php'" class="btnBack">Go back</button>
+        </div>
+    </div>
+</body>
+
+</html>

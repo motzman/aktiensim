@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
       <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title> Aktein</title>
+    <title> Aktien</title>
     <style>
         body {
             background: linear-gradient(135deg, #0205b2, #4f58ff);
@@ -58,6 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             transform: scale(1.05);
         }
 
+          .dashboard {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
         h1 {
             margin-bottom: 30px;
             text-align: center;
@@ -154,8 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
     <button onclick="window.location.href='Create.php'" class="logout_button"> Aktie Hinzufügen</button>
-     <button onclick="window.location.href='login.php'" class="bg-red-500 hover:bg-red-300 p-2 rounded-lg w-lg cursor-pointer"> Login </button>
-
+    <button onclick="window.location.href='login.php'" class="bg-red-500 hover:bg-red-300 p-2 rounded-lg w-lg cursor-pointer">Login </button>
+    <button onclick="window.location.href='dashboard.php'" class="dashboard"> Portfolio</button>
 
     <h1> Aktien</h1>
 

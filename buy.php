@@ -40,27 +40,39 @@ if ($user['balance'] < $totalCost) {
 mysqli_begin_transaction($conn);
 
 try {
-    $sql = "UPDATE users SET balance = balance - $totalCost WHERE id = $userId";
-    mysqli_query($conn, $sql);
+    $stmt = mysqli_prepare($conn, "UPDATE users SET balance = balance - ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "di", $totalCost, $userId);
+    mysqli_stmt_execute($stmt);
 
-    $sql = "UPDATE stocks SET available_shares = available_shares - $quantity, price_per_share = price_per_share * 1.01 WHERE id = $stockId";
-    mysqli_query($conn, $sql);
 
-    $sql = "SELECT quantity FROM user_stocks WHERE user_id = $userId AND stock_id = $stockId";
-    $result = mysqli_query($conn, $sql);
+    $stmt = mysqli_prepare($conn, "UPDATE stocks SET available_shares = available_shares - ?, price_per_share = price_per_share * 1.03 WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "ii", $quantity, $stockId);
+    mysqli_stmt_execute($stmt);
+
+    $stmt = mysqli_prepare($conn, "SELECT quantity FROM user_stocks WHERE user_id = ? AND stock_id = ?");
+    mysqli_stmt_bind_param($stmt, "ii", $userId, $stockId);
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
     $owned = mysqli_fetch_assoc($result);
 
+    mysqli_stmt_close($stmt);
+
+
     if ($owned) {
-        $sql = "UPDATE user_stocks SET quantity = quantity + $quantity WHERE user_id = $userId AND stock_id = $stockId";
-        mysqli_query($conn, $sql);
+        $stmt = mysqli_prepare($conn, "UPDATE user_stocks SET quantity = quantity + ? WHERE user_id = ? AND stock_id = ?");
+        mysqli_stmt_bind_param($stmt, "iii", $quantity, $userId, $stockId);
+        mysqli_stmt_execute($stmt);
     } else {
-        $sql = "INSERT INTO user_stocks (user_id, stock_id, quantity) VALUES ($userId, $stockId, $quantity)";
-        mysqli_query($conn, $sql);
+        $stmt = mysqli_prepare($conn, "INSERT INTO user_stocks (user_id, stock_id, quantity) VALUES (?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "iii", $userId, $stockId, $quantity);
+        mysqli_stmt_execute($stmt);
     }
+    mysqli_stmt_close($stmt);
 
     mysqli_commit($conn);
     echo "Bought shares, $quantity ";
-    echo "<a href='Create.php'>Go back</a>";
+    echo "<a href='index.php'>Go back</a>";
 } catch (Exception $e) {
     mysqli_rollback($conn);
     echo "Transaction failed: " . $e->getMessage();
