@@ -33,35 +33,34 @@ try{
     die("Error: " . $e->getMessage());
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell <?php echo htmlspecialchars($name); ?></title>
-    <style>
-        body { font-family: Arial; margin: 50px; }
-        input, button { margin: 5px 0; padding: 8px; }
-        form { max-width: 300px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-    </style>
 </head>
+  <link rel="stylesheet" href="./styles/forms.css">
 <body>
-     <h2>Sell Stock</h2>
-     
-     <form action="sell.php" method="POST">
-        <div>
-            <h4>Name: <?php echo htmlspecialchars($name); ?></h4>
-            <h4>Price per Share: €<?php echo htmlspecialchars($price); ?></h4>
+  
+    <div class="container">
+        <h2>Aktien Verkaufen</h2>
+        
+        <div class="stock-details">
+            <p><strong>Stock:</strong> <?php echo htmlspecialchars($name); ?></p>
+            <p><strong>Price per Share:</strong> €<?php echo htmlspecialchars(number_format($price, 2)); ?></p>
         </div>
-     
-        <input type="hidden" name="stock_id" value="<?php echo $stock_id; ?>">
+        
+        <form action="sell.php" method="POST">
+            <input type="hidden" name="stock_id" value="<?php echo $stock_id; ?>">
 
-        <label for="quantity">Quantity:</label><br>
-        <input type="number" id="quantity" name="quantity" required min="1"><br>
+            <label for="quantity">Quantity (Anzahl):</label>
+            <input type="number" id="quantity" name="quantity" placeholder="z.b., 10" required min="1">
 
-        <button type="submit">Sell</button>
-    </form>
+            <button type="submit">Sell <?php echo htmlspecialchars($name); ?></button>
+        </form>
+        <div>
+    <a href="index.php" class="go-back-link">Return to Home</a>
+</div>
 </body>
 </html>

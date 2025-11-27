@@ -45,7 +45,7 @@ try {
     mysqli_stmt_execute($stmt);
 
 
-    $stmt = mysqli_prepare($conn, "UPDATE stocks SET available_shares = available_shares - ?, price_per_share = price_per_share * 1.03 WHERE id = ?");
+    $stmt = mysqli_prepare($conn, "UPDATE stocks SET available_shares = available_shares - ?, price_per_share = price_per_share * 2 WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "ii", $quantity, $stockId);
     mysqli_stmt_execute($stmt);
 

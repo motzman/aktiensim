@@ -30,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     } 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,27 +37,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign up</title>
-    <style>
-    </style>
 </head>
-
+<link rel="stylesheet" href="./styles/signup.css">
 <body>
-    <div>
-        <div>
-            <span></span>
-            <button onclick="window.location.href='index.php'">X</button>
-        </div>
+    <div class="container">
+        <h1>Create Account</h1>
 
+        <?php if (!empty($error_message)): ?>
+            <p class="error"><?php echo $error_message; ?></p>
+        <?php endif; ?>
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Choose a Username" required>
+            <input type="password" name="password" placeholder="Choose a Strong Password" required>
+
+            <div class="flex">
+                <button type="submit" class="primary-btn">Sign up</button>
+                <button type="button" class="secondary-btn" onclick="window.location.href='login.php'">Sign in</button>
+            </div>
+        </form>
+        
         <div>
-            <h1>Sign up</h1>
-            <form method="POST">
-                <input type="text" name="username" placeholder="Your username" required>
-                <input type="password" name="password" placeholder="Your Password" required>
-                <div class="flex gap-4">
-                    <button type="submit">Sign up</button>
-                    <button type="button" onclick="window.location.href='signin.php'"> Sign in </button>
-                </div>
-            </form>
+            <a href="index.php" class="go-back-link">Return to Home</a>
         </div>
     </div>
 </body>
